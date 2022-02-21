@@ -19,10 +19,16 @@ bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
     notifyObservers(&mp);
 
     
-    int a, b, c, d, e, f, g, h;
     char * pch;
     pch = strtok ((char *) p.payload.bytes,",");
-    char* opt[4];
+    char* opt[8];
+
+    typedef struct {
+        int port;
+        int value;
+    } Timer;
+    Timer timers[8];
+
     int i = 0;
     while (pch != NULL)
     {
@@ -31,77 +37,49 @@ bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
         pch = strtok (NULL, ",");
     }
 
-    sscanf(opt[0], "%d:%d", &a, &b);
-    sscanf(opt[1], "%d:%d", &c, &d);
-    sscanf(opt[2], "%d:%d", &e, &f);
-    sscanf(opt[3], "%d:%d", &g, &h);
-
-    if(b != 0) {
-        pinMode(a, OUTPUT);
-        digitalWrite(a, 1);
+    //write values to struct
+    for(int i; i< 8; ++i) {
+     sscanf(opt[i], "%d:%d", timers[i].port, timers[i].value);
     }
 
+    //sort by value
+    Timer temp;
 
-    if(d != 0) {
-        pinMode(c, OUTPUT);
-        digitalWrite(c, 1);
-    }
+    for (int i = 0; i < 8; i++) {     
+        for (int j = i+1; j < 8; j++) {     
+            if(timers[i].value < timers[j].value) {    
+                temp = timers[i];    
+                timers[i] = timers[j];    
+                timers[j] = temp;    
+        }     
+    }   
 
-    if(f != 0) {
-        pinMode(e, OUTPUT);
-        digitalWrite(e, 1);
+    //activete all ports
+    for(int i; i< 8; ++i) {
+        if(timers[i].value != 0) {
+             pinMode(timers[i].port, OUTPUT);
+             digitalWrite(timers[i].port, 1);
+        }
     }
-
-    if(h != 0) {
-        pinMode(g, OUTPUT);
-        digitalWrite(g, 1);
-    }
+    //deactivate first element
+    delay((timers[0].value)*1000);
+    digitalWrite(timers[0].port, 0);
     
-    if(b != 0) {
-        delay((b)*1000);
-        digitalWrite(a, 0);
-    }
+    //deactivate other elements
+    for(int i = 1; i< 8; ++i) {
+        int diff = timers[i -1].value - timers[i].value;
 
-    if(d != 0) {
-        if((d-b) > 0) {
-            delay((d -b)*1000);
-            digitalWrite(c, 0);
-        } else {
-            digitalWrite(c, 0);
+        if(diff != 0) {
+            delay((diff)*1000);
+            digitalWrite(timers[i].port, 0);
         }
     }
-
-    if(f != 0) {
-        if((f -d) > 0) {
-            delay((f -d)*1000);
-            digitalWrite(e, 0);
-        } else{
-            digitalWrite(e, 0);
-        }
-    }
-
-    if(h != 0) {
-        if((h -f) > 0){
-            delay((h -f)*1000);
-            digitalWrite(g, 0);
-        } else {
-            digitalWrite(g, 0);
-        }
-    }
-
-
+     
     return false; // Let others look at this message also if they want
 }
 
 
 
+
+
    
-
-
-
-    // // remoteHardwarePlugin.handleReceived(mp)
-    // digitalWrite(25, 1);
-    // delay(atoi( (const char*) p.payload.bytes));
-    // digitalWrite(25, 0);
-
-    // pinMode(25, OUTPUT);
