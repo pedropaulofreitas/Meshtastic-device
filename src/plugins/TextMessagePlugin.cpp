@@ -27,18 +27,18 @@ bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
         int port;
         int value;
     } Timer;
+
     Timer timers[8];
 
     int i = 0;
-    while (pch != NULL)
-    {
+    while (pch != NULL) {
         opt[i] = (char *) malloc( (strlen(pch)+1) * sizeof(char));
         strcpy(opt[i++], pch);
         pch = strtok (NULL, ",");
     }
 
     //write values to struct
-    for(int i; i< 8; ++i) {
+    for(int i = 0; i< 8; ++i) {
      sscanf(opt[i], "%d:%d", timers[i].port, timers[i].value);
     }
 
@@ -51,11 +51,12 @@ bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
                 temp = timers[i];    
                 timers[i] = timers[j];    
                 timers[j] = temp;    
-        }     
-    }   
+            }     
+        } 
+    }  
 
     //activete all ports
-    for(int i; i< 8; ++i) {
+    for(int i = 0; i< 8; ++i) {
         if(timers[i].value != 0) {
              pinMode(timers[i].port, OUTPUT);
              digitalWrite(timers[i].port, 1);
@@ -67,7 +68,7 @@ bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
     
     //deactivate other elements
     for(int i = 1; i< 8; ++i) {
-        int diff = timers[i -1].value - timers[i].value;
+        int diff = timers[i].value - timers[i -1].value;
 
         if(diff != 0) {
             delay((diff)*1000);
