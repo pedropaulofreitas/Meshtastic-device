@@ -5,6 +5,40 @@
 
 TextMessagePlugin *textMessagePlugin;
 
+
+typedef struct {
+    int port;
+    int value;
+} Timer;
+
+void swap(Timer* xp, Timer* yp)
+{
+    Timer temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+ 
+// Function to perform Selection Sort
+void selectionSort(Timer arr[], int n)
+{
+    int i, j, min_idx;
+ 
+    // One by one move boundary of unsorted subarray
+    for (i = 0; i < n - 1; i++) {
+ 
+        // Find the minimum element in unsorted array
+        min_idx = i;
+        for (j = i + 1; j < n; j++)
+            if (arr[j].value < arr[min_idx].value)
+                min_idx = j;
+ 
+        // Swap the found minimum element
+        // with the first element
+        swap(&arr[min_idx], &arr[i]);
+    }
+}
+ 
+
 bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
 {
     auto &p = mp.decoded;
@@ -18,8 +52,9 @@ bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
     powerFSM.trigger(EVENT_RECEIVED_TEXT_MSG);
     notifyObservers(&mp);
 
-    
-    int a, b, c, d, e, f, g, h;
+
+    Timer timers[8];
+
     char * pch;
     pch = strtok ((char *) p.payload.bytes,",");
     char* opt[4];
@@ -27,68 +62,130 @@ bool TextMessagePlugin::handleReceived(const MeshPacket &mp)
     while (pch != NULL)
     {
         opt[i] = (char *) malloc( (strlen(pch)+1) * sizeof(char));
+        sscanf(opt[i], "%d:%d", timers[i].port, timers[i].value);
+
         strcpy(opt[i++], pch);
         pch = strtok (NULL, ",");
     }
 
-    sscanf(opt[0], "%d:%d", &a, &b);
-    sscanf(opt[1], "%d:%d", &c, &d);
-    sscanf(opt[2], "%d:%d", &e, &f);
-    sscanf(opt[3], "%d:%d", &g, &h);
 
-    if(b != 0) {
-        pinMode(a, OUTPUT);
-        digitalWrite(a, 1);
+    selectionSort(timers, 8);
+
+    if(timers[0].value != 0) {
+        pinMode(timers[0].port, OUTPUT);
+        digitalWrite(timers[0].port, 1);
     }
 
-
-    if(d != 0) {
-        pinMode(c, OUTPUT);
-        digitalWrite(c, 1);
+    if(timers[1].value != 0) {
+        pinMode(timers[1].port, OUTPUT);
+        digitalWrite(timers[1].port, 1);
     }
 
-    if(f != 0) {
-        pinMode(e, OUTPUT);
-        digitalWrite(e, 1);
+    if(timers[2].value != 0) {
+        pinMode(timers[2].port, OUTPUT);
+        digitalWrite(timers[2].port, 1);
     }
 
-    if(h != 0) {
-        pinMode(g, OUTPUT);
-        digitalWrite(g, 1);
-    }
-    
-    if(b != 0) {
-        delay((b)*1000);
-        digitalWrite(a, 0);
+    if(timers[3].value != 0) {
+        pinMode(timers[3].port, OUTPUT);
+        digitalWrite(timers[3].port, 1);
     }
 
-    if(d != 0) {
-        if((d-b) > 0) {
-            delay((d -b)*1000);
-            digitalWrite(c, 0);
+    if(timers[4].value != 0) {
+        pinMode(timers[4].port, OUTPUT);
+        digitalWrite(timers[4].port, 1);
+    }
+
+    if(timers[5].value != 0) {
+        pinMode(timers[5].port, OUTPUT);
+        digitalWrite(timers[5].port, 1);
+    }
+
+    if(timers[6].value != 0) {
+        pinMode(timers[6].port, OUTPUT);
+        digitalWrite(timers[6].port, 1);
+    }
+
+    if(timers[7].value != 0) {
+        pinMode(timers[7].port, OUTPUT);
+        digitalWrite(timers[7].port, 1);
+    }
+
+    if(timers[0].value != 0) {
+        delay((timers[0].value)*1000);
+        digitalWrite(timers[0].port, 0);
+    }
+
+    if(timers[1].value != 0) {
+        if((timers[1].value - timers[0].value) > 0) {
+            delay((timers[1].value - timers[0].value)*1000);
+            digitalWrite(timers[1].port, 0);
         } else {
-            digitalWrite(c, 0);
+            digitalWrite(timers[1].port, 0);
         }
     }
 
-    if(f != 0) {
-        if((f -d) > 0) {
-            delay((f -d)*1000);
-            digitalWrite(e, 0);
-        } else{
-            digitalWrite(e, 0);
-        }
-    }
-
-    if(h != 0) {
-        if((h -f) > 0){
-            delay((h -f)*1000);
-            digitalWrite(g, 0);
+    if(timers[2].value != 0) {
+        if((timers[2].value - timers[1].value) > 0) {
+            delay((timers[2].value - timers[1].value)*1000);
+            digitalWrite(timers[2].port, 0);
         } else {
-            digitalWrite(g, 0);
+            digitalWrite(timers[2].port, 0);
         }
     }
 
+ 
+    if(timers[3].value != 0) {
+        if((timers[3].value - timers[2].value) > 0) {
+            delay((timers[3].value - timers[2].value)*1000);
+            digitalWrite(timers[3].port, 0);
+        } else {
+            digitalWrite(timers[3].port, 0);
+        }
+    }
+
+  
+    if(timers[4].value != 0) {
+        if((timers[4].value - timers[3].value) > 0) {
+            delay((timers[4].value - timers[3].value)*1000);
+            digitalWrite(timers[4].port, 0);
+        } else {
+            digitalWrite(timers[4].port, 0);
+        }
+    }
+
+  
+    if(timers[5].value != 0) {
+        if((timers[5].value - timers[4].value) > 0) {
+            delay((timers[5].value - timers[4].value)*1000);
+            digitalWrite(timers[5].port, 0);
+        } else {
+            digitalWrite(timers[5].port, 0);
+        }
+    }
+
+  
+    if(timers[6].value != 0) {
+        if((timers[6].value - timers[5].value) > 0) {
+            delay((timers[6].value - timers[5].value)*1000);
+            digitalWrite(timers[6].port, 0);
+        } else {
+            digitalWrite(timers[6].port, 0);
+        }
+    }
+
+  
+    if(timers[7].value != 0) {
+        if((timers[7].value - timers[6].value) > 0) {
+            delay((timers[7].value - timers[6].value)*1000);
+            digitalWrite(timers[7].port, 0);
+        } else {
+            digitalWrite(timers[7].port, 0);
+        }
+    }
+
+   
+  
 
     return false; // Let others look at this message also if they want
 }
